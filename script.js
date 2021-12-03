@@ -6,42 +6,79 @@ function computerPlay() {
   return options[rand];
 }
 
-function playRound(playerSel, computerSel) {
-  const playerIndex = options.indexOf(playerSel);
-  const computerIndex = options.indexOf(computerSel);
-  if (playerIndex == -1) {
-    return `Error: player selection "${playerSel}" is not valid`;
-  }
-  if (computerIndex == -1) {
-    return `Error: computer selection "${computerSel}" is not valid`;
-  }
+function playRound(playerInput, computerInput) {
+  const playerIndex = options.indexOf(playerInput);
+  const computerIndex = options.indexOf(computerInput);
 
   const compare = playerIndex - computerIndex;
 
-  // let test;
   switch (compare) {
     case 0:
-      return `It's a tie... both of you selected ${playerSel}`;
-    // test = "tie";
-    // break;
+      return "tie";
     case -1:
-      return `You lose! ${computerSel} beats ${playerSel}`;
-    // test = "lose";
-    // break;
+      return "lose";
     default:
       // case -2, 1, 2
-      return `You win! ${playerSel} beats ${computerSel}`;
-    // test = "win";
+      return "win";
   }
-  // return `player = ${playerSel} ${playerIndex}; computer = ${computerSel} ${computerIndex}; compare = ${compare}; test = ${test}`;
 }
 
 function game() {
+  let playerSelection, computerSelection;
+  let playerCounter = 0,
+    computerCounter = 0;
+
   for (let i = 0; i < 5; i++) {
-    let playerSelection = "RoCk";
-    playerSelection = playerSelection.toLowerCase();
-    let computerSelection = computerPlay();
-    console.log(playRound(playerSelection, computerSelection));
+    playerSelection = prompt(`Round ${i + 1}: Rock, Paper or Scissors?`);
+    if (playerSelection === 'debug') {return;} // debug
+    
+    if (!playerSelection) { // Any falsy value, either blank entry or pressed 'Cancel'
+      playerSelection = "";
+    }
+    else {
+      playerSelection = playerSelection.toLowerCase();
+    }
+
+    if (!options.includes(playerSelection)) {
+      alert(`"${playerSelection}" is not a valid choice...`);
+      i--;
+      continue; // restart the loop
+    }
+    computerSelection = computerPlay();
+
+    let roundResult = playRound(playerSelection, computerSelection);
+    switch (roundResult) {
+      case "tie":
+        alert(
+          `It's a tie... both of you selected ${playerSelection}. Play this round again!`
+        );
+        i--;
+        break;
+      case "lose":
+        alert(
+          `You lose this round! ${computerSelection} beats ${playerSelection}`
+        );
+        computerCounter++;
+        break;
+      case "win":
+        alert(
+          `You win this round! ${playerSelection} beats ${computerSelection}`
+        );
+        playerCounter++;
+        break;
+    }
+
+    console.log(
+      `${roundResult}; player: ${playerCounter}; computer: ${computerCounter};`
+    );
+    
+  }
+
+  // Declare winner
+  if (playerCounter > computerCounter) {
+    alert(`You win! Your score is: ${playerCounter}`);
+  } else {
+    alert(`You lose! Your score is: ${playerCounter}`);
   }
 }
 
