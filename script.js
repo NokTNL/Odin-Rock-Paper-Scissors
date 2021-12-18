@@ -30,12 +30,16 @@ function game() {
 
   for (let i = 0; i < 5; i++) {
     playerSelection = prompt(`Round ${i + 1}: Rock, Paper or Scissors?`);
-    if (playerSelection === 'debug') {return;} // debug
-    
-    if (!playerSelection) { // Any falsy value, either blank entry or pressed 'Cancel'
-      playerSelection = "";
+    // debug
+    if (playerSelection === "debug") {
+      debugger;
+      return;
     }
-    else {
+
+    // Any falsy value, either blank entry or pressed 'Cancel'
+    if (!playerSelection) {
+      playerSelection = "";
+    } else {
       playerSelection = playerSelection.toLowerCase();
     }
 
@@ -44,6 +48,7 @@ function game() {
       i--;
       continue; // restart the loop
     }
+
     computerSelection = computerPlay();
 
     let roundResult = playRound(playerSelection, computerSelection);
@@ -71,7 +76,6 @@ function game() {
     console.log(
       `${roundResult}; player: ${playerCounter}; computer: ${computerCounter};`
     );
-    
   }
 
   // Declare winner
