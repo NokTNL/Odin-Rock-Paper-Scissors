@@ -1,89 +1,80 @@
 "use strict";
+// Initialisation
+let playerCounter = 0,
+  computerCounter = 0;
 const options = ["scissors", "rock", "paper"]; // alternatively, use indexes to compare everything
+// DOM
+const playerPrompt = document.querySelector("#player-prompt");
+const playerChoices = document.querySelectorAll(".player-choice");
+const scoreboard = document.querySelector("#scoreboard");
+const announcement = document.querySelector("#announcement");
 
 function computerPlay() {
   const rand = Math.floor(Math.random() * options.length);
   return options[rand];
 }
 
-function playRound(playerInput, computerInput) {
-  const playerIndex = options.indexOf(playerInput);
-  const computerIndex = options.indexOf(computerInput);
+// Main flow
 
+// !! Problem: loops are not possible without async
+playerPrompt.textContent = `Rock, Paper or Scissors?`;
+
+playerChoices.forEach((choice) => {
+  choice.addEventListener("click", () => {
+    playRound(choice.id);
+  });
+});
+
+function playRound(playerSelection) {
+  // Prevents the game running when either of them wins
+  if (playerCounter >= 5 || computerCounter >= 5) {
+    return;
+  }
+
+  const playerIndex = options.indexOf(playerSelection);
+  const computerSelection = computerPlay();
+  const computerIndex = options.indexOf(computerSelection);
   const compare = playerIndex - computerIndex;
 
+  let roundResult;
   switch (compare) {
     case 0:
-      return "tie";
+      roundResult = "tie";
+      break;
     case -1:
-      return "lose";
+      roundResult = "lose";
+      break;
+    // case -2, 1, 2
     default:
-      // case -2, 1, 2
-      return "win";
+      roundResult = "win";
   }
-}
 
-function game() {
-  let playerSelection, computerSelection;
-  let playerCounter = 0,
-    computerCounter = 0;
-
-  for (let i = 0; i < 5; i++) {
-    playerSelection = prompt(`Round ${i + 1}: Rock, Paper or Scissors?`);
-    // debug
-    if (playerSelection === "debug") {
-      debugger;
-      return;
-    }
-
-    // Any falsy value, either blank entry or pressed 'Cancel'
-    if (!playerSelection) {
-      playerSelection = "";
-    } else {
-      playerSelection = playerSelection.toLowerCase();
-    }
-
-    if (!options.includes(playerSelection)) {
-      alert(`"${playerSelection}" is not a valid choice...`);
-      i--;
-      continue; // restart the loop
-    }
-
-    computerSelection = computerPlay();
-
-    let roundResult = playRound(playerSelection, computerSelection);
-    switch (roundResult) {
-      case "tie":
-        alert(
-          `It's a tie... both of you selected ${playerSelection}. Play this round again!`
-        );
-        i--;
-        break;
-      case "lose":
-        alert(
-          `You lose this round! ${computerSelection} beats ${playerSelection}`
-        );
-        computerCounter++;
-        break;
-      case "win":
-        alert(
-          `You win this round! ${playerSelection} beats ${computerSelection}`
-        );
-        playerCounter++;
-        break;
-    }
-
-    console.log(
-      `${roundResult}; player: ${playerCounter}; computer: ${computerCounter};`
-    );
+  switch (roundResult) {
+    case "tie":
+      announcement.textContent = `It's a tie... both of you selected ${playerSelection}. Play this round again!`;
+      return; // Start over again
+    case "lose":
+      announcement.textContent = `You lose this round! ${computerSelection} beats ${playerSelection}`;
+      computerCounter++;
+      break;
+    case "win":
+      announcement.textContent = `You win this round! ${playerSelection} beats ${computerSelection}`;
+      playerCounter++;
+      break;
   }
+
+  // Update score if win or lose
+  scoreboard.textContent = `Player score: ${playerCounter}; Computer score: ${computerCounter};`;
 
   // Declare winner
-  if (playerCounter > computerCounter) {
-    alert(`You win! Your score is: ${playerCounter}`);
-  } else {
-    alert(`You lose! Your score is: ${playerCounter}`);
+  if (playerCounter >= 5) {
+    playerPrompt.textContent = `You win the game!`;
+    return;
+  } else if (computerCounter >= 5) {
+    playerPrompt.textContent = `You lose the game!`;
+    return;
   }
-}
 
-game();
+  // else, next round
+  playerPrompt.textContent = `Rock, Paper or Scissors?`;
+}
